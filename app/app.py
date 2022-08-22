@@ -154,6 +154,7 @@ if uploaded_file is not None:
         export_df[key] = value
     
     export_df = export_df[sdc_columns]
+    export_df.fillna('N/A', inplace = True)
 
     st.write(export_df)
     csv_output = convert_df(export_df)
