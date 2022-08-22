@@ -139,7 +139,7 @@ if uploaded_file is not None:
     shopify_dictionary['Shipping Phone'] = [re.sub("[^0-9]", "", number) for number in shopify_dictionary['Shipping Phone']]
     #build new dictionary
     export_dictionary = {value : shopify_dictionary[key] for key, value in mapping_dict.items()}
-    export_df = pd.DataFrame(export_dictionary).replace('', 'N/A')\
+    export_df = pd.DataFrame(export_dictionary).replace('', np.nan)\
                                .dropna(subset = [
                                                    'RECIPIENT_ADDRESS_CONTACT_NAME*'
                                                   ,'RECIPIENT_ADDRESS*'
