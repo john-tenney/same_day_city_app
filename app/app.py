@@ -4,6 +4,7 @@ import numpy as np
 import csv
 from io import StringIO
 import datetime
+import re
 
 
 sdc_columns = [  'SHIPMENT_PACKAGE_IDENTIFIER*', 'SHIPPER_ADDRESS_CONTACT_NAME*'\
@@ -135,9 +136,10 @@ if uploaded_file is not None:
     #first apostrophe before zip
     shopify_dictionary['Shipping Zip'] = [zip_code.replace("'", '') for zip_code in shopify_dictionary['Shipping Zip']]
     #do I need to clean the shipping address2 to only be numbers?
+    shopify_dictionary['Shipping Phone'] = [re.sub("[^0-9]", "", number) for number in shopify_dictionary['Shipping Phone']]
     #build new dictionary
     export_dictionary = {value : shopify_dictionary[key] for key, value in mapping_dict.items()}
-    export_df = pd.DataFrame(export_dictionary).replace('', np.nan)\
+    export_df = pd.DataFrame(export_dictionary).replace('', 'N/A')\
                                .dropna(subset = [
                                                    'RECIPIENT_ADDRESS_CONTACT_NAME*'
                                                   ,'RECIPIENT_ADDRESS*'
@@ -147,9 +149,11 @@ if uploaded_file is not None:
                                                                     ]
                                    ,how = 'all')
    
-                                        
+    
     for key, value in default_sdc_columns.items():
         export_df[key] = value
+    
+    export_df = export_df[sdc_columns]
 
     st.write(export_df)
     csv_output = convert_df(export_df)
