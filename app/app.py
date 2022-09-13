@@ -39,7 +39,20 @@ sdc_columns = [  'SHIPMENT_PACKAGE_IDENTIFIER*', 'SHIPPER_ADDRESS_CONTACT_NAME*'
                , 'HAZMAT_RADIOACTIVE_PHYSCIAL_FORM', 'HAZMAT_RADIOACTIVE_CHEMICAL_FORM'\
                , 'OFFEROR_NAME**', 'NAME_OF_SIGNATORY', 'EMERGENCY_CONTACT_NUMBER**'
                ]
-
+    
+sdc_zip_codes = ['38002', '38004', '38011', '38014', '38015', '38016', '38017', '38018', '38023', '38027',\
+                 '38028', '38029', '38053', '38054', '38058', '38060', '38066', '38071', '38083', '38088',\
+                 '38101', '38103', '38104', '38105', '38106', '38107', '38108', '38109', '38111', '38112',\
+                 '38113', '38114', '38115', '38116', '38117', '38118', '38119', '38120', '38122', '38124',\
+                 '38125', '38126', '38127', '38128', '38130', '38131', '38132', '38133', '38134', '38135',\
+                 '38136', '38137', '38138', '38139', '38141', '38145', '38147', '38148', '38150', '38151',\
+                 '38152', '38157', '38159', '38163', '38166', '38167', '38168', '38173', '38174', '38175',\
+                 '38177', '38181', '38182', '38183', '38184', '38186', '38187', '38188', '38190', '38193',\
+                 '38194', '38197', '38611', '38632', '38637', '38641', '38651', '38654', '38664', '38671',\
+                 '38672', '38680', '38686', '72301', '72303', '72313', '72320', '72325', '72327', '72329',\
+                 '72331', '72332', '72338', '72339', '72346', '72348', '72350', '72364', '72373', '72376',\
+                 '72384', '72386']
+    
 default_sdc_columns = {'SHIPMENT_PACKAGE_IDENTIFIER*': 'S',
         'SHIPPER_ADDRESS_CONTACT_NAME*': 'HOME PLACE PASTURES',
         'SHIPMENT_READY_DATE_MM_DD_YYYY*': '07/29/2022',
@@ -53,7 +66,7 @@ default_sdc_columns = {'SHIPMENT_PACKAGE_IDENTIFIER*': 'S',
         'SHIPPER_ADDRESS_ZIP*': 38116,
         'SHIPPER_ADDRESS_PHONE*': 8289896049,
         'SHIPPER_ADDRESS_SPECIAL_INSTRUCTIONS': np.nan,
-        'SHIPPER_ADDRESS_NOTIFICATION_EMAIL': np.nan,
+        'SHIPPER_ADDRESS_NOTIFICATION_EMAIL': 'info@homeplacepastures.com',
         'SHIPPER_ADDRESS_EMAIL_NOTIFICATION_OPT_IN': 'N',
         'SHIPPER_ADDRESS_PHONE_NOTIFICATION_OPT_IN': 'N',
         'SHIPPER_THIS_IS_RESIDENTIAL_ADDRESS': 'N',
@@ -116,7 +129,7 @@ mapping_dict =  {
     
 def convert_df(df):
      # IMPORTANT: Cache the conversion to prevent computation on every rerun
-     return df.to_csv().encode('utf-8')
+     return df.to_csv(index = False).encode('utf-8')
  
 today = str(datetime.date.today())
 
@@ -134,7 +147,7 @@ if uploaded_file is not None:
     shopify_dictionary = {z[0]: list(z[1:]) for z in zip(*shopify_lists)} 
     #clean up weird shit from shopify
     #first apostrophe before zip
-    shopify_dictionary['Shipping Zip'] = [zip_code.replace("'", '') for zip_code in shopify_dictionary['Shipping Zip']]
+    shopify_dictionary['Shipping Zip'] = [zip_code.replace("'", '')[:5] for zip_code in shopify_dictionary['Shipping Zip']]
     #do I need to clean the shipping address2 to only be numbers?
     shopify_dictionary['Shipping Phone'] = [re.sub("[^0-9]", "", number) for number in shopify_dictionary['Shipping Phone']]
     #build new dictionary
@@ -148,7 +161,8 @@ if uploaded_file is not None:
                                                   ,'RECIPIENT_ADDRESS_ZIP*'                                                                                                                             
                                                                     ]
                                    ,how = 'all')
-   
+                               
+    export_df = export_df[export_df['RECIPIENT_ADDRESS_ZIP*'].isin(sdc_zip_codes)]
     
     for key, value in default_sdc_columns.items():
         export_df[key] = value
