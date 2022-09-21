@@ -6,6 +6,7 @@ from io import StringIO
 import datetime
 import re
 
+tomorrow = str(datetime.date.today() + datetime.timedelta(days = 1))
 
 sdc_columns = [  'SHIPMENT_PACKAGE_IDENTIFIER*', 'SHIPPER_ADDRESS_CONTACT_NAME*'\
                , 'SHIPMENT_READY_DATE_MM_DD_YYYY*', 'SHIPMENT_READY_TIME_HH_MM*'\
@@ -55,7 +56,7 @@ sdc_zip_codes = ['38002', '38004', '38011', '38014', '38015', '38016', '38017', 
     
 default_sdc_columns = {'SHIPMENT_PACKAGE_IDENTIFIER*': 'S',
         'SHIPPER_ADDRESS_CONTACT_NAME*': 'HOME PLACE PASTURES',
-        'SHIPMENT_READY_DATE_MM_DD_YYYY*': '07/29/2022',
+        'SHIPMENT_READY_DATE_MM_DD_YYYY*': tomorrow,
         'SHIPMENT_READY_TIME_HH_MM*': '10:00',
         'SHIPPER_TIME_ZONE*': 'US/Central',
         'SHIPPER_ADDRESS_COMPANY_NAME': 'FEDEX CPC',
@@ -77,8 +78,8 @@ default_sdc_columns = {'SHIPMENT_PACKAGE_IDENTIFIER*': 'S',
         'RECIPIENT_ADDRESS_EMAIL_NOTIFICATION_OPT_IN': 'Y',
         'RECIPIENT_ADDRESS_PHONE_NOTIFICATION_OPT_IN': 'Y',
         'RECIPIENT_THIS_IS_RESIDENTIAL_ADDRESS': 'Y',
-        'RECIPIENT_ADDRESS_OPEN_TIME': '7:00',
-        'RECIPIENT_ADDRESS_CLOSE_TIME': '20:00',
+        'RECIPIENT_ADDRESS_OPEN_TIME': np.nan,
+        'RECIPIENT_ADDRESS_CLOSE_TIME': np.nan,
         'SHIPMENT_DECLARED_VALUE*': 150,
         'SIGNATURE_SERVICE*': 'SR',
         'SHIPMENT_SPECIAL_SERVICES': 'SAME_DAY_RETURN_TO_SENDER',
@@ -149,7 +150,7 @@ if uploaded_file is not None:
     #first apostrophe before zip
     shopify_dictionary['Shipping Zip'] = [zip_code.replace("'", '')[:5] for zip_code in shopify_dictionary['Shipping Zip']]
     #do I need to clean the shipping address2 to only be numbers?
-    shopify_dictionary['Shipping Phone'] = [re.sub("[^0-9]", "", number) for number in shopify_dictionary['Shipping Phone']]
+    shopify_dictionary['Shipping Phone'] = [(re.sub("[^0-9]", "", number))[-10:] for number in shopify_dictionary['Shipping Phone']]
     #build new dictionary
     export_dictionary = {value : shopify_dictionary[key] for key, value in mapping_dict.items()}
     export_df = pd.DataFrame(export_dictionary).replace('', np.nan)\
