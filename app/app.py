@@ -6,7 +6,8 @@ from io import StringIO
 import datetime
 import re
 
-tomorrow = str(datetime.date.today() + datetime.timedelta(days = 1))
+tomorrow_date= datetime.date.today() + datetime.timedelta(days = 1)
+tomorrow = datetime.date.strftime(tomorrow_date, "%m/%d/%Y")
 
 sdc_columns = [  'SHIPMENT_PACKAGE_IDENTIFIER*', 'SHIPPER_ADDRESS_CONTACT_NAME*'\
                , 'SHIPMENT_READY_DATE_MM_DD_YYYY*', 'SHIPMENT_READY_TIME_HH_MM*'\
